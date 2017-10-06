@@ -34,7 +34,7 @@ class Bet(models.Model):
     outcome = models.NullBooleanField(blank=True, null=True)
     min_buyin = models.IntegerField()
     per_person_cap = models.IntegerField()
-    initiation = models.DateTimeField(auto_now_add=True)
+    initiation = models.DateTimeField(null=True, blank=True)
     expiration = models.DateTimeField(null=True, blank=True)
 
     def as_json(self):
@@ -57,7 +57,7 @@ class Response(models.Model):
     bet = models.ForeignKey(Bet, on_delete=models.CASCADE, blank=True, null=True)
     answer = models.BooleanField()
     amount = models.IntegerField()
-    resp_timestamp = models.DateTimeField(default=datetime.now, blank=True)
+    resp_timestamp = models.DateTimeField(null=True, blank=True)
 
     def as_json(self):
         return dict(
