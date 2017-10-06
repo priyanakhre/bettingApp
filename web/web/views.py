@@ -28,28 +28,24 @@ def index(request):
     raw = urllib.request.urlopen(url).read().decode('utf-8')
     recent_bets = json.loads(raw)
 
-    success_context = {}
-    error_context = ''
+    context = {}
 
     if all_bets['success']:
-        success_context['all_bets'] = all_bets['data']
+        context['all_bets'] = all_bets['data']
     else:
-        error_context = 'All bets not available'
+        return render(request, 'home/error.html', {'error':'All bets not available'})
 
     if all_cats['success']:
-        success_context['all_cats'] = all_cats['data']
+        context['all_cats'] = all_cats['data']
     else:
-        error_context = 'All categories not available'
+        return render(request, 'home/error.html', {'error':'All categories not available'})
 
     if recent_bets['success']:
-        success_context['recent_bets'] = recent_bets['data']
+        context['recent_bets'] = recent_bets['data']
     else:
-        error_context = 'Recent bets not available'
+        return render(request, 'home/error.html', {'error': 'Recent bets not available'})
 
-    if not (all_bets['success'] and all_cats['success'] and recent_bets['success']):
-        return render(request, 'home/error.html', error_context)
-    else:
-        return render(request, 'home/index.html', success_context)
+    return render(request, 'home/index.html', context)
 
 
 def bet_detail(request, id):
@@ -57,8 +53,17 @@ def bet_detail(request, id):
     raw = urllib.request.urlopen(url).read().decode('utf-8')
     bet = json.loads(raw)
 
+    url = urllib.request.Request(exp_endpoint + 'bet_responses/' + id + '/')
+    raw = urllib.request.urlopen(url).read().decode('utf-8')
+    responses = json.loads(raw)
+
+    context = {}
+    context['bet'] = bet['data']
+
     if not bet['success']:
-        context = 'Bet not available!'
-        return render(request, 'home/error.html', context)
-    else:
-        return render(request, 'home/bet_detail.html', bet["data"])
+        return render(request, 'home/error.html', {'error':'Bet not available!'})
+
+    if responses['success']:
+        context['responses'] = responses['data']
+
+    return render(request, 'home/bet_detail.html', context)

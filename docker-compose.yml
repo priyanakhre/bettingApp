@@ -6,7 +6,7 @@ models:
       - ./models:/app
     ports:
       - "8001:8000"
-    command: bash -c "python manage.py makemigrations youbet && python manage.py migrate && mod_wsgi-express start-server --working-directory ./ --reload-on-changes ./models/wsgi.py"
+    command: bash -c "python manage.py makemigrations youbet && python manage.py migrate && python manage.py loaddata ./models/db.json && mod_wsgi-express start-server --working-directory ./ --reload-on-changes ./models/wsgi.py"
     
 exp:
     image: tp33/django

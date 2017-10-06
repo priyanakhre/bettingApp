@@ -62,8 +62,8 @@ class Response(models.Model):
     def as_json(self):
         return dict(
             id=self.id,
-            user=self.user,
-            bet=self.bet,
+            user=User.as_json(self.user),
+            bet=Bet.as_json(self.bet),
             answer=self.answer,
             amount=self.amount,
             resp_timestamp=self.resp_timestamp

@@ -2,31 +2,36 @@
 {% load static %}
 
 {% block content %}
-    <div class="jumbotron">
-        <h1 style="text-align: center">Welcome to Bets!</h1>
-    </div>
-
-
     <div class="content container">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-2">
+                <h2>Categories</h2>
+                <div class="list-group">
+                    {% for category in all_cats %}
+                        <a href="#" class="list-group-item">{{ category }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-5">
                 <h2>All Bets</h2>
                 <ul>
-                    {% for bet in recommended_items %}
-
-                        
-                            <li><a href="{% url 'bet_detail' bet.bet_id %}">{{ bet.question }}</a></li>
-                        
-                    {% endfor %}
+                {% for bet in all_bets %}
+                <a href="{% url 'web-bet_detail' bet.id %}" style="text-decoration:none">
+                    <div class="panel panel-primary">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">{{ bet.category }}</h3>
+                      </div>
+                      <div class="panel-body">
+                        {{ bet.question }}
+                      </div>
+                    </div>
+                </a>
+                {% endfor %}
                 </ul>
-                {% if not recommended_items %}
+                {% if not all_bets %}
                     <p>Sorry, no listings are available at this time.</p>
-                
                 {% endif %}
             </div>
-
-            
-
         </div>
     </div>
 {% endblock %}

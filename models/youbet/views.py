@@ -120,7 +120,7 @@ def create_bet(request):
         bet = Bet(
             privacy=request.POST["privacy"],
             response_limit=request.POST["response_limit"],
-            #category=request.POST["category"],
+            category=request.POST["category"],
             question=request.POST["question"],
             description=request.POST["description"],
             min_buyin=request.POST["min_buyin"],
@@ -253,7 +253,7 @@ def get_all_responses_for_bet(request, bet_id):
         except:
             return api_response(False, "Failed to find bet")
         try:
-            responses = Response.objects.filter(bet=bet)
+            responses = Response.objects.filter(bet__id=bet_id)
         except:
             return api_response(False, "Failed to find responses for this bet")
         data = [obj.as_json() for obj in responses]

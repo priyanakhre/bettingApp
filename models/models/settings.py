@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -72,14 +73,14 @@ WSGI_APPLICATION = 'models.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-          'default': {
+    'default': {
           'ENGINE': 'django.db.backends.mysql',
           'NAME': 'cs4501',
           'USER': 'www',
           'PASSWORD': '$3cureUS',
           'HOST': 'db',
-          }
-      }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
