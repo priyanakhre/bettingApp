@@ -5,7 +5,7 @@ class User(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
-    password = models.CharField(max_length=50)
+    password = models.CharField(max_length=100)
     num_tokens = models.IntegerField()
     num_flags = models.IntegerField()
     joined_date = models.DateField(default=datetime.now, blank=True)
@@ -24,8 +24,15 @@ class User(models.Model):
             num_flags = self.num_flags
         )
 
+class Authenticator(models.Model):
+    user_id= models.OneToOneField(User, on_delete=models.CASCADE)
+    authenticator = models.CharField(max_length=64, primary_key=True, blank=False,)
+    date_created = models.DateField(default=datetime.now,blank=True)
+
+
 
 class Bet(models.Model):
+
     privacy = models.BooleanField()
     response_limit = models.IntegerField()
     category = models.CharField(max_length=50, default='misc')

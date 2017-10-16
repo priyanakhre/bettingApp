@@ -20,4 +20,9 @@ from . import views
 urlpatterns = [
     url(r'^home/$', views.index, name='web-index'),
     url(r'^home/bets/(?P<id>[0-9]+)/$', views.bet_detail, name='web-bet_detail'),
+    url(r'^register/', views.create_account, name='register'),
+    url(r'^login/', views.login, name='login'),
+    url(r'^logout/', views.logout, name='logout'),
+    url(r'^create_bet/', views.create_bet, name='create-bet'),
+
 ]

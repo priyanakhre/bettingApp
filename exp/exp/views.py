@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.conf import settings
 from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 
 models_endpoint = 'http://models-api:8000/api/v1/'
 
@@ -81,3 +82,82 @@ def response_detail(request, response_id):
         return exp_response(True, response_json['data'])
     else:
         return exp_response(False, response_json['data'])
+
+@csrf_exempt
+def create_user(request):
+    data = {
+        "first_name": request.POST.get("first_name", ""),
+        "last_name": request.POST.get("last_name", ""),
+        "username": request.POST.get("username", ""),
+        "password": request.POST.get("password", "")
+    }
+    endpoint = models_endpoint+ 'user/'
+    data_encoded = urllib.parse.urlencode(data).encode('utf-8')
+    request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
+    raw = urllib.request.urlopen(request).read().decode('utf-8')
+    create = json.loads(raw)
+    return JsonResponse(create)
+    
+
+@csrf_exempt
+def login(request):
+    if request.method != "POST":
+        return exp_response(False, "Must Be POST")
+    data = {
+        "username": request.POST.get("username", ""),
+        "password": request.POST.get("password", "")
+    }
+    endpoint = models_endpoint+ 'user/authenticate/'
+    data_encoded = urllib.parse.urlencode(data).encode('utf-8')
+    request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
+    raw = urllib.request.urlopen(request).read().decode('utf-8')
+    login = json.loads(raw)
+    return JsonResponse(login)
+
+@csrf_exempt
+def logout(request):
+    if request.method != "POST":
+        return exp_response(False, "Must be a POST request")
+
+    data = {
+        "auth_token": request.COOKIES.get('auth_token', '')
+    }
+
+    endpoint = models_endpoint+ 'authenticators/delete'
+    data_encoded = urllib.parse.urlencode(data).encode('utf-8')
+    request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
+    raw = urllib.request.urlopen(request).read().decode('utf-8')
+    logout = json.loads(raw)
+    return JsonResponse(logout)
+
+@csrf_exempt
+def create_bet(request):
+    data = {
+
+        "privacy": request.POST.get("privacy", ""),
+        "response_limit":request.POST.get("response_limit", ""),
+        "category": request.POST.get("category", ""),
+        "question": request.POST.get("question", ""),
+        "description": request.POST.get("description", ""),
+        "min_buyin" :request.POST.get("min_buyin", ""),
+        "per_person_cap":request.POST.get("per_person_cap", ""),
+        "initiation": request.POST.get("initiation", ""),
+        "expiration":request.POST.get("expiration", ""),
+        "auth_token":request.POST.get("auth_token", "")
+
+    
+    }
+    endpoint = models_endpoint+ 'bet/'
+    data_encoded = urllib.parse.urlencode(data).encode('utf-8')
+    request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
+    raw = urllib.request.urlopen(request).read().decode('utf-8')
+    create_user = json.loads(raw)
+    return JsonResponse(create_user)
+
+def check_authenticator(request):
+    endpoint = models_endpoint+ 'authenticators/check/'
+    data_encoded = urllib.parse.urlencode(request.GET).encode('utf-8')
+    request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
+    raw = urllib.request.urlopen(request).read().decode('utf-8')
+    check_auth = json.loads(raw)
+    return JsonResponse(check_auth)

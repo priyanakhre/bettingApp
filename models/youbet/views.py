@@ -1,11 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth import hashers
+from datetime import datetime
+import hashlib
+import hmac
+import os
+import random
+from django.conf import settings
 
-from .models import User
-from .models import Bet
-from .models import Response
-
+from .models import User, Bet, Response, Authenticator
+#229 61--check lines
 def api_response(success, payload):
     return JsonResponse({'success': success, 'data': payload})
 
@@ -35,25 +41,35 @@ def user_service(request, user_id=''):
 # USER - create
 @csrf_exempt
 def create_user(request):
-    # validation
+
     keys = ["first_name", "last_name", "username", "password", "num_tokens", "num_flags"]
     if not all(key in keys for key in request.POST.keys()):
         return api_response(False, "User not created; missing fields")
 
+    # validation
+    username = request.POST.get("username", "")
+    check_user = User.objects.filter(username=username)
+
+    if check_user.exists():
+        return api_response(False, "Username Already Exists!")
+
     try:
         user = User(
-            first_name=request.POST["first_name"],
-            last_name=request.POST["last_name"],
-            username=request.POST["username"],
-            password=request.POST["password"],
-            num_tokens=request.POST["num_tokens"],
-            num_flags=request.POST["num_flags"]
+            first_name=request.POST.get("first_name", ""),
+            last_name=request.POST.get("last_name", ""),
+            username=request.POST.get("username", ""),
+            password=hashers.make_password(request.POST["password"]),
+            num_tokens = 0,
+            num_flags = 0   
         )
         user.save()
     except:
         return api_response(False, 'Could not create user')
-    return api_response(True, 'User successfully inserted into database')
 
+            
+    auth_token = create_authenticator(user)
+    return api_response(True, "User successfully inserted into Database")
+    
 # USER - read
 @csrf_exempt
 def get_all_users(request):
@@ -85,6 +101,90 @@ def delete_user(request, user):
     return api_response(True, 'User deleted')
 
 
+#AUTHENTICATOR SERVICE
+
+
+
+@csrf_exempt
+def authenticate_user(request):
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    #return api_response(True, username + "cry")
+
+    try:
+        user = User.objects.get(username=username)
+
+        pwd = user.password
+        if hashers.check_password(password, pwd):
+            auth_token = create_authenticator(user)
+            data = {}
+            data["auth_token"] = auth_token
+            return api_response(True, data)
+        else:
+            return api_response(False, "Wrong username or password")
+    except:
+        return api_response(False, "Wrong Username or Password")
+
+@csrf_exempt
+def create_authenticator(user):
+    
+    auth_token = Authenticator.objects.filter(user_id=user)
+
+    if auth_token.exists():
+        auth_token.delete()
+
+    
+    authenticator_token= hmac.new(
+        key = settings.SECRET_KEY.encode('utf-8'),
+        msg = os.urandom(32),
+        digestmod = 'sha256',
+    ).hexdigest()
+
+    authenticator = Authenticator(
+        authenticator = authenticator_token,
+        user_id = user,
+        date_created = datetime.now()
+    )
+    authenticator.save()
+    return authenticator_token
+
+@csrf_exempt
+def check_authenticator(request):
+    if request.method == "GET":
+        auth_token = request.GET.get("auth_token", "")
+
+        try:
+            authenticator = Authenticator.objects.get(authenticator=auth_token)
+        except:
+            return api_response(False, "Enter valid authenticator")
+
+        data = {}
+        data["user_id"] = authenticator.user.id
+        data["username"] = authenticator.user.username
+        data["first_name"] = authenticator.user.first_name
+        data["last_name"] = authenticator.user.last_name
+
+        return api_response(True, data)
+    else:
+        return api_response(False, "Must Be GET")
+
+
+@csrf_exempt
+def delete_authenticator(request):
+    if request.method == "GET":
+        return api_response(False, "Must Be POST")
+    if request.method == "POST":
+        auth_token = request.POST["auth_token"]
+        try:
+            auth_token = Authenticator.objects.get(authenticator=auth_token)
+            auth_token.delete()
+            
+        except:
+            return api_response(False, "Authenticator Does Not Exist")
+
+        return api_response(True, "Deleted Authenticator")
+
+
 #### BET SERVICES ####
 
 @csrf_exempt
@@ -112,7 +212,13 @@ def bet_service(request, bet_id=''):
 @csrf_exempt
 def create_bet(request):
     # validation
-    keys = ["privacy", "category", "response_limit", "question", "description", "min_buyin", "per_person_cap"]
+    try:
+        authenticator = Authenticator.objects.get(authenticator=request.POST.get('auth_token', ''))
+        author = authenticator.user_id
+    except:
+        return api_response(False, "You must be logged in to create a bet.")
+
+    keys = ["privacy", "category", "response_limit", "question", "description", "min_buyin", "per_person_cap", "auth_token", "initiation", "expiration"]
     if not all(key in keys for key in request.POST.keys()):
         return api_response(False, "Bet not created; missing fields")
 
@@ -260,3 +366,5 @@ def get_all_responses_for_bet(request, bet_id):
         return api_response(True, data)
     else:
         return api_response(False, "Unable to process HTTP Request")
+
+    

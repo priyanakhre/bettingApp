@@ -2,7 +2,22 @@
 {% load static %}
 
 {% block content %}
+    {% if message %}
+        {{ message }}<br><br>
+    {% endif %}
     <div class="content container">
+    <form action="/register/">
+        <input type="submit" value="Register" />
+    </form>
+    <form action="/login/">
+        <input type="submit" value="Log In" />
+    </form>
+    <form action="/logout/">
+        <input type="submit" value="Log Out" />
+    </form>
+    <form action="/create_bet/">
+        <input type="submit" value="Create Bet" />
+    </form>
         <div class="row">
             <div class="col-md-2">
                 <h2>Categories</h2>
