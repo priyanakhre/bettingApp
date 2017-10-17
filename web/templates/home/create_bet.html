@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 <form action="/create_bet/" method="post">
     {% csrf_token %}
     {% if message %}
@@ -6,3 +9,4 @@
     {{ form }}
     <input type="submit" value="Submit" />
 </form>
+{% endblock %}

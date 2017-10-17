@@ -5,12 +5,12 @@ class RegisterForm(forms.Form):
 	first_name = forms.CharField(label='First name', max_length=100)
 	last_name = forms.CharField(label='Last name', max_length=100)
 	username = forms.CharField(label='Username', max_length=30)
-	password = forms.CharField(label='Password', max_length=30)
-	confirm_password = forms.CharField(label='Confirm Password', max_length=30)
+	password = forms.CharField(label='Password', max_length=30, widget=forms.PasswordInput)
+	confirm_password = forms.CharField(label='Confirm Password', max_length=30, widget=forms.PasswordInput)
 
 class LoginForm(forms.Form):
 	username = forms.CharField(label='Username', max_length=30)
-	password = forms.CharField(label='Password', max_length=30)
+	password = forms.CharField(label='Password', max_length=30, widget=forms.PasswordInput)
 
 
 class CreateBetForm(forms.Form):

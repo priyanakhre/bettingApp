@@ -2,13 +2,10 @@ import urllib.request
 import urllib.parse
 from django.shortcuts import render, Http404
 from django.urls import reverse
-#import requests
 import json
 from .forms import RegisterForm, LoginForm, CreateBetForm
 import datetime
 from django.views.decorators.csrf import csrf_exempt
-#from json import JSONEncoder
-#from django.template import loader
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpRequest
 
 exp_endpoint = 'http://exp-api:8000/exp/'
@@ -175,14 +172,6 @@ def login(request):
     next = HttpResponseRedirect(reverse('web-index'))
     next.set_cookie('auth_token', auth_token)
     return next
-
-
-
-
-
-
-
-
 
 
 def create_bet(request):

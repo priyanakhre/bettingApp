@@ -120,7 +120,7 @@ def logout(request):
         return exp_response(False, "Must be a POST request")
 
     data = {
-        "auth_token": request.COOKIES.get('auth_token', '')
+        "auth_token": request.COOKIES.get('auth_token', '') ##Should this get from cookies or get from 
     }
 
     endpoint = models_endpoint+ 'authenticators/delete'
