@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="text-center jumbotron" style="background: #483D8B;">
+	<div class="container-fluid">
+		<h3 style="color:white;"> Search Results for {{ query }}</h3>
+	</div>
+</div>
+{% if results %}
+
+{% for bet in results %}
+	<div class="col-sm-6 col-md-4">
+			    <div class="thumbnail">
+			      <div class="caption">
+			  
+			        <div>
+						<a href="{% url 'web-bet_detail' bet.id %}"><h3> {{bet.question}} </h3></a>
+                    	<p>Category: {{ bet.category }}</p>
+                    	<p>Description: {{ bet.description }}</p>
+                    	
+					</div>
+			      </div>
+			    </div>
+			</div>
+{% endfor %}
+{% else %}
+	<center><h2> No Bets Found </h2></center>
+{% endif %}
+
+{% endblock %}

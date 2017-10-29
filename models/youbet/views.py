@@ -233,9 +233,11 @@ def create_bet(request):
             per_person_cap=request.POST["per_person_cap"]
         )
         bet.save()
+        resp = {}
+        resp["id"] = bet.id
     except:
         return api_response(False, 'Could not create bet')
-    return api_response(True, 'Bet successfully inserted into database')
+    return api_response(True, resp)
 
 # BET - read
 @csrf_exempt

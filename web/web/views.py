@@ -220,3 +220,22 @@ def create_bet(request):
             return render(request, 'home/create_bet.html', {'message': response['data'], 'form': form, 'auth_token': auth})
         response = HttpResponseRedirect(reverse('web-index'))
         return response
+
+def search(request):
+    query = request.GET.get('query', '').strip()
+    #search = {'query': request.GET.get('query', '').strip()}
+    if not query:
+        return render(request, 'home/search_results.html', {'results': [], 'search': search})
+    url1 = exp_endpoint + 'search/?query='+query
+
+    url = urllib.request.Request(url1)
+    raw = urllib.request.urlopen(url).read().decode('utf-8')
+    bets = json.loads(raw)
+
+    #return bets
+    if bets['success']:
+        
+        #return bets["data"]
+        return render(request, 'home/search_results.html', {'results': bets["data"], 'query': query})
+    else:
+        return render(request, 'home/search_results.html', {'results': [], 'query': query})

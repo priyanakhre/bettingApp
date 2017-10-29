@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^exp/accounts/logout/$', views.logout, name='logout'),
     url(r'^exp/accounts/check_auth/$', views.check_authenticator, name='check-authenticator'),
     url(r'^exp/user/create$', views.create_user, name='create-user'),
+    url(r'^exp/search/$', views.find_bet, name='find-bet'),
 
 ]

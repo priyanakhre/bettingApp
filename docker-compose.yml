@@ -12,6 +12,8 @@ exp:
     image: tp33/django
     links:
       - models:models-api
+      - kafka:kafka
+      - es:es
     volumes:
       - ./exp:/app
     ports:
@@ -27,3 +29,27 @@ web:
   ports:
     - "8000:8000"
   command: bash -c "python manage.py migrate && mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./web/wsgi.py"
+
+kafka:
+   image: spotify/kafka
+   container_name: kafka
+   environment:
+      ADVERTISED_HOST: kafka
+      ADVERTISED_PORT: 9092
+   hostname: kafka
+   
+es:
+   image: elasticsearch:2.0
+   container_name: es
+   ports:
+      - "9200:9200"
+
+batch:
+   image: tp33/django
+   container_name: batch
+   volumes:
+    - .:/app
+   links:
+      - kafka:kafka
+      - es:es
+   command: bash -c "python batch-script.py"

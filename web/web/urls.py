@@ -24,5 +24,6 @@ urlpatterns = [
     url(r'^login/', views.login, name='login'),
     url(r'^logout/', views.logout, name='logout'),
     url(r'^create_bet/', views.create_bet, name='create-bet'),
+    url(r'^search/', views.search, name='search'),
 
 ]

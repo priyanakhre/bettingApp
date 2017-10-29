@@ -5,10 +5,13 @@ import urllib.parse
 from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.conf import settings
+from kafka import KafkaProducer
 from datetime import datetime
+from elasticsearch import Elasticsearch
 from django.views.decorators.csrf import csrf_exempt
 
 models_endpoint = 'http://models-api:8000/api/v1/'
+es = Elasticsearch(['es'])
 
 def exp_response(success, payload):
     return JsonResponse({'success': success, 'data': payload})
@@ -152,7 +155,35 @@ def create_bet(request):
     request = urllib.request.Request(endpoint, data=data_encoded, method='POST')
     raw = urllib.request.urlopen(request).read().decode('utf-8')
     create_user = json.loads(raw)
+    if create_user["success"]:
+
+        producer = KafkaProducer(bootstrap_servers='kafka:9092')
+        bet = {  #WHAT FIELDS TO INCLUDE HERE??????
+            'question': data["question"],
+            'category': data["category"],
+            'description': data["description"],
+            'per_person_cap': data["per_person_cap"],
+            'id': create_user["data"]["id"]
+
+        }
+        producer.send('new-listings-topic', json.dumps(bet).encode('utf-8'))
     return JsonResponse(create_user)
+
+def find_bet(request):
+    if request.method == "GET":
+        query = request.GET.get('query', '').strip()
+        try:
+            result = es.search(index='listing_index', body={'query': {'query_string': {'query': query}}, 'size': 10})
+        
+        except Exception as e:
+            return exp_response(False, str(e))
+        res = []
+        for item in result['hits']['hits']:
+            res.append(item['_source'])
+      
+        return exp_response(True, res)
+    else:
+        return exp_response(False, "Must be a GET request")
 
 def check_authenticator(request):
     endpoint = models_endpoint+ 'authenticators/check/'
