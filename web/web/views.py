@@ -223,7 +223,7 @@ def create_bet(request):
 
 def search(request):
     query = request.GET.get('query', '').strip()
-    #search = {'query': request.GET.get('query', '').strip()}
+  
     if not query:
         return render(request, 'home/search_results.html', {'results': [], 'search': search})
     url1 = exp_endpoint + 'search/?query='+query
@@ -235,7 +235,6 @@ def search(request):
     #return bets
     if bets['success']:
         
-        #return bets["data"]
         return render(request, 'home/search_results.html', {'results': bets["data"], 'query': query})
     else:
         return render(request, 'home/search_results.html', {'results': [], 'query': query})
