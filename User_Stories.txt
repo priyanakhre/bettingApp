@@ -61,6 +61,21 @@ We would provide the infrastructure such that administrators could enter in the 
 As a user, I want to flag someone.
 You can submit a formal report that describes what you think they did wrong and if you think they were associating with another group of users. We log the information internally and use it to find/counter malicious nodes. We also display the number of flags someone has next to the user profile to draw attention to malicious users. The number of flags that an account submits is also logged so malicious nodes that aggressively flag other nodes will also be monitored and taken offline.
 
+You should use this as a tool that will help you cement your understanding of how you want your create-listing/add to ES/search flow to work as well as a tool to help you divide up the work among your group members.
+
+11)
+As a user, I want to search for an outstanding bet.
+I can search the relevant parameters (and not include the parameters that I am not aware of). Relevant search results will appear. The search result ordering is done using ES to determine relevance and ordering.
+
+12)
+As a user, I want to search for all bets made by a specific user.
+I can search for the user and all bets will show up (this works because ES works).
+
+13)
+As a user, I want to search or all bets with a specific minimum or maximum.
+ES makes it such that sometimes* (not every time), searching for this arbitrary value will return all bets with this number included as one of the parameters (it must be the exact value, not a value that is close).
+
+
 System logistics description:
 A person starts a bet by inviting a group of people to make a bet with him/her. This creates a group and every member that was invited either joins the group for the bet or leaves depending on whether or not they agree with the bet_terms. The bet_terms (which are documented in another txt file) contain information such as the question, the outcomes, the minimum bet amount (this must be set to some nonzero amount because otherwise people could join the bet and make their bet last therefore increasing their payoff---see (1)), and the consensus mechanism. At a certain point, everyone initiates their bets at the same time. After this point, everyone can sell out of their bets, double down, or buy into the other side (1).
 
