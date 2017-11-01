@@ -2,15 +2,15 @@
 
 {% block content %}
 
-<div class="text-center jumbotron" style="background: #483D8B;">
+
 	<div class="container-fluid">
-		<h3 style="color:white;"> Search Results for {{ query }}</h3>
+		<h3> Search Results for {{ query }}</h3>
 	</div>
-</div>
+
 {% if results %}
 
 {% for bet in results %}
-	<div class="col-sm-6 col-md-4">
+	
 			    <div class="thumbnail">
 			      <div class="caption">
 			  
@@ -22,7 +22,7 @@
 					</div>
 			      </div>
 			    </div>
-			</div>
+			
 {% endfor %}
 {% else %}
 	<center><h2> No Bets Found </h2></center>
