@@ -21,14 +21,10 @@ install:
 
 before_script:
   - docker-compose up -d
-  - docker ps -a
   
 script:
   - docker exec bettingapp_models_1 python manage.py test --noinput
 
-after_script:
-  - docker-compose stop
-  - docker stop mysql
   
 branches:
   only:
