@@ -24,17 +24,12 @@ before_script:
   - docker ps -a
   
 script:
-  - >
-    docker exec -it bettingapp_models_1 bash -c
-    "python manage.py test --noinput"
-    
+  - docker exec bettingapp_models_1 python manage.py test
+
 after_script:
   - docker-compose stop
   - docker stop mysql
-  - docker rm `docker ps -a -q`
-  - docker rmi `docker images -q`
-  - rm -rf db
-
+  
 branches:
   only:
     - master
