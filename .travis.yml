@@ -25,7 +25,7 @@ before_script:
   
 script:
   - >
-    docker exec -it bettingapp_models_1 bash
+    docker exec -it bettingapp_models_1 bash -c
     "python manage.py test"
     
 after_script:
