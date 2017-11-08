@@ -24,8 +24,9 @@ before_script:
   - docker ps -a
   
 script:
-  - docker exec -it bettingapp_models_1 bash
-  - python manage.py test
+  - >
+    docker exec -it bettingapp_models_1 bash
+    "python manage.py test"
     
 after_script:
   - docker-compose stop
