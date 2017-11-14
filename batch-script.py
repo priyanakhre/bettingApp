@@ -4,10 +4,8 @@ import json
 import time
 
 while True:
-	print("yes ")
-	time.sleep(90) 
-	print("no ")
-	#es = Elasticsearch(['es'])
+	
+	time.sleep(130) 
 
 	fixture = {'question' : "will it rain tomorrow?", 'category' : 'weather', 'description' : "weather tomorrow",	'per_person_cap': 78, 'id': 6}
 	

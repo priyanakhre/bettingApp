@@ -1,26 +1,26 @@
 models:
-    image: tp33/django
-    external_links:
-      -  mysql:db
-    volumes:
-      - ./models:/app
-    ports:
-      - "8001:8000"
-    command: bash -c "python manage.py makemigrations youbet && python manage.py migrate && python manage.py loaddata db.json && mod_wsgi-express start-server --working-directory ./ --reload-on-changes ./models/wsgi.py"
+  image: tp33/django
+  external_links:
+    -  mysql:db
+  volumes:
+    - ./models:/app
+  #ports:
+    #- "8001:8000"
+  command: bash -c "python manage.py makemigrations youbet && python manage.py migrate && python manage.py loaddata db.json && mod_wsgi-express start-server --working-directory ./ --reload-on-changes ./models/wsgi.py"
     
 exp:
-    image: tp33/django
-    links:
-      - models:models-api
-      - kafka:kafka
-      - es:es
-    volumes:
-      - ./exp:/app
-    ports:
-      - "8002:8000"
-    command: bash -c "mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./exp/wsgi.py"
+  image: tp33/django
+  links:
+    - models:models-api
+    - kafka:kafka
+    - es:es
+  volumes:
+    - ./exp:/app
+  #ports:
+    #- "8002:8000"
+  command: bash -c "mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./exp/wsgi.py"
     
-web:
+web1:
   image: tp33/django
   links:
     - exp:exp-api
@@ -28,6 +28,16 @@ web:
     - ./web:/app
   ports:
     - "8000:8000"
+  command: bash -c "python manage.py migrate && mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./web/wsgi.py"
+
+web2:
+  image: tp33/django
+  links:
+    - exp:exp-api
+  volumes:
+    - ./web:/app
+  ports:
+    - "8004:8000"
   command: bash -c "python manage.py migrate && mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./web/wsgi.py"
 
 kafka:
@@ -53,3 +63,33 @@ batch:
       - kafka:kafka
       - es:es
    command: bash -c "python batch-script.py"
+
+selenium-chrome:
+  image: selenium/standalone-chrome
+  container_name: selenium-chrome
+  links:
+    - web1:web1
+  ports:
+    - "4444:4444"
+
+selenium:
+  image: tp33/django
+  container_name: selenium
+  links:
+    - selenium-chrome:selenium-chrome
+    - web1:web1
+  volumes:
+    - .:/app
+  command: bash -c "pip install selenium==3.7.0 && python functional_tests.py "
+
+# haproxy:
+#   image: haproxy:1.7
+#   container_name: haproxy
+#   links:
+#     - web1
+#     - web2
+#   volumes:
+#     - ./haproxy:/app
+#     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+#   ports:
+#     - "8000:8000"
