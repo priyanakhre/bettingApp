@@ -80,16 +80,16 @@ selenium:
     - web1:web1
   volumes:
     - .:/app
-  command: bash -c "pip install selenium==3.7.0 && python functional_tests.py "
+  command: bash -c "pip install selenium==3.7.0 && python functional_tests.py"
 
-# haproxy:
-#   image: haproxy:1.7
-#   container_name: haproxy
-#   links:
-#     - web1
-#     - web2
-#   volumes:
-#     - ./haproxy:/app
-#     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-#   ports:
-#     - "8000:8000"
+haproxy:
+  image: haproxy:1.7
+  container_name: haproxy
+  links:
+    - web1
+    - web2
+  volumes:
+    - .:/app
+    - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  ports:
+    - "8001:8000"

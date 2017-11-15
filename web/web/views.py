@@ -70,7 +70,6 @@ def bet_detail(request, id):
 
 
 
-
 def create_account(request):
     auth = request.COOKIES.get('auth_token')
     if auth:
