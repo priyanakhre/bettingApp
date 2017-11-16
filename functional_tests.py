@@ -5,17 +5,17 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException
 
 class testFrontEnd(unittest.TestCase):
-    @classmethod
-    def setUp(inst):
-        driver = webdriver.Remote(
-		   command_executor='http://selenium-chrome:4444/wd/hub',
-		   desired_capabilities=DesiredCapabilities.CHROME)
-        driver.get("http://web1:8000/home/")
 
-    def signUp(self):
-        assert "CrystalBall" in driver.title
-        element = driver.find_element_by_xpath("/html/body/div/form[1]")
-        assert "Register" in element.getAttribute("value")
+    def setUp(self):
+        self.driver = webdriver.Remote(
+		   command_executor='http://selenium-chrome:4444/wd/hub',
+		   desired_capabilities=DesiredCapabilities.CHROME
+        )
+
+    def test_signUp(self):
+        driver = self.driver
+        driver.get("http://web1:8000/home/")
+        element = driver.find_element_by_id("register")
         element.click()
         first_name = driver.find_element_by_id("id_first_name")
         last_name = driver.find_element_by_id("id_last_name")
@@ -29,10 +29,55 @@ class testFrontEnd(unittest.TestCase):
         password.send_keys('testpassword')
         confirm_password.send_keys('testpassword')
 
-        submit = driver.find_element_by_xpath("/html/body/form[2]/input[7]")
+        submit = driver.find_element_by_id("regsubmit")
         submit.click()
 
-        #element.click()
+        element = driver.find_element_by_id("login")
+        element.click()
 
-    def tearDown(inst):
-        driver.close()
+        username = driver.find_element_by_id("id_username")
+        password = driver.find_element_by_id("id_password")
+
+        username.send_keys('priya1997')
+        password.send_keys('testpassword')
+        submit = driver.find_element_by_id("loginsubmit")
+        submit.click()
+
+        self.assertTrue(self.is_element_present(By.ID, "loginmessage"))
+
+
+    def test_create_bet(self):
+        driver = self.driver
+        driver.get("http://web1:8000/home/")
+
+        element = driver.find_element_by_id("login")
+        element.click()
+
+        username = driver.find_element_by_id("id_username")
+        password = driver.find_element_by_id("id_password")
+
+        username.send_keys('priya1997')
+        password.send_keys('testpassword')
+        submit = driver.find_element_by_id("loginsubmit")
+        submit.click()
+
+        driver.find_element_by_id("id_privacy").click()
+        driver.find_element_by_id("id_response_limit").send_keys(5)
+        driver.find_element_by_id("id_category").send_keys("school")
+        driver.find_element_by_id("id_question").send_keys("Best School?")
+        driver.find_element_by_id("id_description").send_keys("what the best school is")
+        driver.find_element_by_id("id_min_buyin").send_keys(2)
+        driver.find_element_by_id("id_per_person_cap").send_keys(3)
+        driver.find_element_by_id("id_expiration").send_keys("10/31/2018")
+
+        driver.find_element_by_id("createsubmit").click()
+
+        driver.implicitly_wait(30)
+
+        self.assertTrue(self.is_element_present(By.ID, "allbets"))
+
+    def tearDown(self):
+        self.driver.close()
+
+if __name__ == '__main__':
+    unittest.main()

@@ -7,7 +7,7 @@
     {% if message %}
 		{{ message }}<br><br>
 	{% endif %}
-    {{ form }}
-    <input type="submit" value="Submit" />
+    {{ form.as_p }}
+    <input id="regsubmit" type="submit" value="Submit" />
 </form>
 {% endblock %}
