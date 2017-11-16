@@ -15,6 +15,7 @@ class testFrontEnd(unittest.TestCase):
     def test_signUp(self):
         driver = self.driver
         driver.get("http://web1:8000/home/")
+        assert "CrystalBall" in driver.title
         element = driver.find_element_by_id("register")
         element.click()
         first_name = driver.find_element_by_id("id_first_name")
@@ -31,6 +32,20 @@ class testFrontEnd(unittest.TestCase):
 
         submit = driver.find_element_by_id("regsubmit")
         submit.click()
+        exists = False
+        try:
+            driver.find_element_by_id("id_username")
+        except NoSuchElementException:
+            exists = False
+            assert exists
+        exists = True
+        assert exists
+        
+
+    def test_login(self):
+        driver = self.driver
+        driver.get("http://web1:8000/home/")
+        #assert "CrystalBall" in driver.title
 
         element = driver.find_element_by_id("login")
         element.click()
@@ -38,17 +53,27 @@ class testFrontEnd(unittest.TestCase):
         username = driver.find_element_by_id("id_username")
         password = driver.find_element_by_id("id_password")
 
-        username.send_keys('priya1997')
-        password.send_keys('testpassword')
-        submit = driver.find_element_by_id("loginsubmit")
+        username.send_keys('priya2')
+        password.send_keys('nakhre')
+        #//*[@id="loginsubmit"]
+        submit = driver.find_element_by_xpath("//*[@id='loginsubmit']")
+        
+        #submit = driver.find_element_by_id("loginsubmit")
         submit.click()
-
-        self.assertTrue(self.is_element_present(By.ID, "loginmessage"))
-
+        exists = False
+        try:
+            driver.find_element_by_id("loginmessage")
+        except NoSuchElementException:
+            exists = False
+            assert exists
+        exists = True
+        assert exists
 
     def test_create_bet(self):
         driver = self.driver
         driver.get("http://web1:8000/home/")
+        assert "CrystalBall" in driver.title
+        
 
         element = driver.find_element_by_id("login")
         element.click()
@@ -56,9 +81,16 @@ class testFrontEnd(unittest.TestCase):
         username = driver.find_element_by_id("id_username")
         password = driver.find_element_by_id("id_password")
 
-        username.send_keys('priya1997')
-        password.send_keys('testpassword')
-        submit = driver.find_element_by_id("loginsubmit")
+        username.send_keys('priya2')
+        password.send_keys('nakhre')
+        #//*[@id="loginsubmit"]
+        submit = driver.find_element_by_xpath("//*[@id='loginsubmit']")
+        
+        #submit = driver.find_element_by_id("loginsubmit")
+        submit.click()
+
+    
+        submit = driver.find_element_by_xpath('//*[@id="bs-example-navbar-collapse-1"]/ul[1]/li[2]/form/input')
         submit.click()
 
         driver.find_element_by_id("id_privacy").click()
@@ -70,14 +102,22 @@ class testFrontEnd(unittest.TestCase):
         driver.find_element_by_id("id_per_person_cap").send_keys(3)
         driver.find_element_by_id("id_expiration").send_keys("10/31/2018")
 
-        driver.find_element_by_id("createsubmit").click()
+        driver.find_element_by_xpath("//*[@id='createsubmit']").click()
 
-        driver.implicitly_wait(30)
-
-        self.assertTrue(self.is_element_present(By.ID, "allbets"))
+        driver.implicitly_wait(10)
+        exists = False
+        try:
+            driver.find_element_by_xpath("//*[@id='allbets']").click()
+        except NoSuchElementException:
+            exists = False
+            assert exists
+        exists = True
+        assert exists
 
     def tearDown(self):
         self.driver.close()
+
+
 
 if __name__ == '__main__':
     unittest.main()
