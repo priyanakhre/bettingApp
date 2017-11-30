@@ -32,6 +32,21 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+                    <h3>People who viewed this bet also viewed...</h3>
+                    {% if not recs %}
+                        <h4>No recommendations for this bet</h4>
+                    {% else %}
+                        {% for rec in recs %}
+                            <div class="panel panel-primary">
+                              <div class="panel-heading">
+                                <a href="{% url 'web-bet_detail' rec.id %}" style="color:#ffffff;"><h3 color="white" class="panel-title"> {{rec.question}} </h3></a>
+                            </div>
+                              <div class="panel-body">
+                                Answer: {{ rec.description}}<br>
+                              </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
 
             </div>

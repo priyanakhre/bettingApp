@@ -5,7 +5,7 @@ import time
 
 while True:
 	
-	time.sleep(200) 
+	time.sleep(450) 
 
 	fixture = {'question' : "will it rain tomorrow?", 'category' : 'weather', 'description' : "weather tomorrow",	'per_person_cap': 78, 'id': 6}
 	

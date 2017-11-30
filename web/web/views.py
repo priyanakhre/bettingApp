@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpRe
 exp_endpoint = 'http://exp-api:8000/exp/'
 
 def index(request):
+    print("test")
     url = urllib.request.Request(exp_endpoint+'all_bets/')
     raw = urllib.request.urlopen(url).read().decode('utf-8')
     all_bets = json.loads(raw)
@@ -49,24 +50,36 @@ def index(request):
 
 
 def bet_detail(request, id):
-    url = urllib.request.Request(exp_endpoint + 'bet_detail/' + id + '/')
-    raw = urllib.request.urlopen(url).read().decode('utf-8')
-    bet = json.loads(raw)
 
-    url = urllib.request.Request(exp_endpoint + 'bet_responses/' + id + '/')
-    raw = urllib.request.urlopen(url).read().decode('utf-8')
-    responses = json.loads(raw)
+    auth_token = request.COOKIES.get('auth_token').strip()
+    if not auth_token:
+        return HttpResponseRedirect(reverse('login'))
+    else:
+        url1 = exp_endpoint + 'bet_detail/' + id + '/' + '?auth_token='+auth_token
+        
+        url = urllib.request.Request(url1)
+        raw = urllib.request.urlopen(url).read().decode('utf-8')
+        bet = json.loads(raw)
 
-    context = {}
-    context['bet'] = bet['data']
+        url = urllib.request.Request(exp_endpoint + 'bet_responses/' + id + '/')
+        raw = urllib.request.urlopen(url).read().decode('utf-8')
+        responses = json.loads(raw)
 
-    if not bet['success']:
-        return render(request, 'home/error.html', {'error':'Bet not available!'})
-    
-    if responses['success']:
-        context['responses'] = responses['data']
+        if not bet['success']:
+            return render(request, 'home/error.html', {'error':'Bet not available!'})
 
-    return render(request, 'home/bet_detail.html', context)
+        context = {}
+        context['bet'] = bet['data']["bet"]
+        context['recs'] = bet['data']['recs']['recs']
+
+
+        
+        
+        if responses['success']:
+            context['responses'] = responses['data']
+
+
+        return render(request, 'home/bet_detail.html', context)
 
 
 

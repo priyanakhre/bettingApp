@@ -10,7 +10,7 @@ import os
 import random
 from django.conf import settings
 
-from .models import User, Bet, Response, Authenticator
+from .models import *
 #229 61--check lines
 def api_response(success, payload):
     return JsonResponse({'success': success, 'data': payload})
@@ -159,10 +159,7 @@ def check_authenticator(request):
             return api_response(False, "Enter valid authenticator")
 
         data = {}
-        data["user_id"] = authenticator.user.id
-        data["username"] = authenticator.user.username
-        data["first_name"] = authenticator.user.first_name
-        data["last_name"] = authenticator.user.last_name
+        data["user_id"] = authenticator.user_id_id
 
         return api_response(True, data)
     else:
@@ -250,7 +247,35 @@ def get_all_bets(request):
     return api_response(True, data)
 
 def get_bet(request, bet):
-    return api_response(True, bet.as_json())
+    data = {}
+    data["bet"] = bet.as_json()
+    data["recs"] = recommendations(request, bet.id )
+    return api_response(True, data)
+
+def recommendations(request, bet_id):
+    recs = []
+    data = {}
+    if not Reccomendations.objects.filter(item_id_id=bet_id).exists():
+        data["recs"] = recs
+        return data
+    recommendations = Reccomendations.objects.get(item_id_id=bet_id).recommended_items
+    #"5,6,7
+    list_items = [x for x in recommendations.split(',')]
+    if len(list_items) >= 3:
+        recs.append(Bet.objects.get(pk=int(list_items[0])).as_json())
+        recs.append(Bet.objects.get(pk=int(list_items[1])).as_json())
+        recs.aooend(Bet.objects.get(pk=int(list_items[2])).as_json())
+
+
+    else:
+        if len(list_items) == 1:
+            recs.append(Bet.objects.get(pk=int(list_items[0])).as_json())
+
+        if len(list_items) == 2:
+            recs.append(Bet.objects.get(pk=int(list_items[0])).as_json())
+            recs.append(Bet.objects.get(pk=int(list_items[1])).as_json())
+    data["recs"] = recs
+    return data
 
 # BET - update
 @csrf_exempt

@@ -57,11 +57,28 @@ def all_categories(request):
 
 
 def bet_detail(request, bet_id):
-    url = urllib.request.Request(models_endpoint+'bet/' + bet_id + '/')
+
+    auth_token = request.GET.get('auth_token', '').strip()
+    url = urllib.request.Request(models_endpoint+'bet/' + bet_id + '/' )
     raw = urllib.request.urlopen(url).read().decode('utf-8')
     bet_json = json.loads(raw)
 
     if bet_json['success']:
+        
+        url2 = urllib.request.Request(models_endpoint+'authenticators/check/' + '?auth_token='+auth_token)
+        raw2 = urllib.request.urlopen(url2).read().decode('utf-8')
+        user_json = json.loads(raw2)
+        print(user_json)
+        
+        if user_json["success"]:
+            
+            producer = KafkaProducer(bootstrap_servers='kafka:9092')
+            
+            user_info = {  
+                'user-id': user_json["data"]["user_id"],   #GET USER id????/
+                'item-id': bet_id,
+            }
+            producer.send('bet-detail-topic', json.dumps(user_info).encode('utf-8'))
         return exp_response(True, bet_json['data'])
     else:
         return exp_response(False, bet_json['data'])

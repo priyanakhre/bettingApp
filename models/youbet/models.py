@@ -75,3 +75,7 @@ class Response(models.Model):
             amount=self.amount,
             resp_timestamp=self.resp_timestamp
         )
+
+class Reccomendations(models.Model):
+    item_id = models.OneToOneField(Bet, on_delete=models.CASCADE)
+    recommended_items = models.CharField(max_length=300)

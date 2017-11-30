@@ -4,8 +4,8 @@ models:
     -  mysql:db
   volumes:
     - ./models:/app
-  #ports:
-    #- "8001:8000"
+  ports:
+    - "8003:8000"
   command: bash -c "python manage.py makemigrations youbet && python manage.py migrate && python manage.py loaddata db.json && mod_wsgi-express start-server --working-directory ./ --reload-on-changes ./models/wsgi.py"
     
 exp:
@@ -16,8 +16,8 @@ exp:
     - es:es
   volumes:
     - ./exp:/app
-  #ports:
-    #- "8002:8000"
+  ports:
+    - "8002:8000"
   command: bash -c "mod_wsgi-express start-server --reload-on-changes --log-to-terminal ./exp/wsgi.py"
     
 web1:
@@ -64,23 +64,23 @@ batch:
       - es:es
    command: bash -c "python batch-script.py"
 
-selenium-chrome:
-  image: selenium/standalone-chrome
-  container_name: selenium-chrome
-  links:
-    - web1:web1
-  ports:
-    - "4444:4444"
+# selenium-chrome:
+#   image: selenium/standalone-chrome
+#   container_name: selenium-chrome
+#   links:
+#     - web1:web1
+#   ports:
+#     - "4444:4444"
 
-selenium:
-  image: tp33/django
-  container_name: selenium
-  links:
-    - selenium-chrome:selenium-chrome
-    - web1:web1
-  volumes:
-    - .:/app
-  command: bash -c "pip install selenium==3.7.0 && python functional_tests.py"
+# selenium:
+#   image: tp33/django
+#   container_name: selenium
+#   links:
+#     - selenium-chrome:selenium-chrome
+#     - web1:web1
+#   volumes:
+#     - .:/app
+#   command: bash -c "pip install selenium==3.7.0 && python functional_tests.py"
 
 haproxy:
   image: haproxy:1.7
@@ -93,3 +93,64 @@ haproxy:
     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
   ports:
     - "8001:8000"
+
+batch2:
+   image: tp33/django
+   container_name: batch2
+   volumes:
+    - ./spark:/app
+   links:
+      - kafka:kafka
+   command: bash -c "python batch-script2.py"
+
+spark-master:
+  image: gettyimages/spark
+  command: bin/spark-class org.apache.spark.deploy.master.Master -h spark-master
+  container_name: spark-master
+  hostname: spark-master
+  environment:
+    MASTER: spark://spark-master:7077
+    SPARK_CONF_DIR: /conf
+  external_links:
+    -  mysql:db
+  expose:
+    - 7001
+    - 7002
+    - 7003
+    - 7004
+    - 7005
+    - 7006
+    - 7077
+    - 6066
+  ports:
+    - 4040:4040
+    - 6066:6066
+    - 7077:7077
+    - 8080:8080
+  volumes:
+    - ./spark:/tmp/data
+
+spark-worker:
+  image: gettyimages/spark
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+  container_name: spark-worker
+  hostname: spark-worker
+  environment:
+    SPARK_CONF_DIR: /conf
+    SPARK_WORKER_CORES: 2
+    SPARK_WORKER_MEMORY: 512m
+    SPARK_WORKER_PORT: 8881
+    SPARK_WORKER_WEBUI_PORT: 8081
+  links:
+    - spark-master
+  expose:
+    - 7012
+    - 7013
+    - 7014
+    - 7015
+    - 7016
+    - 8881
+  ports:
+    - 8081:8081
+  volumes:
+    - ./spark:/tmp/data
