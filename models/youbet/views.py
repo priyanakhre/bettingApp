@@ -264,7 +264,7 @@ def recommendations(request, bet_id):
     if len(list_items) >= 3:
         recs.append(Bet.objects.get(pk=int(list_items[0])).as_json())
         recs.append(Bet.objects.get(pk=int(list_items[1])).as_json())
-        recs.aooend(Bet.objects.get(pk=int(list_items[2])).as_json())
+        recs.append(Bet.objects.get(pk=int(list_items[2])).as_json())
 
 
     else:
